@@ -2,30 +2,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define IMAGE_DATA_OFFSET 122 
-
-uint32_t parseWidth(FILE *input_image){
-    uint8_t wBytes[4];
-    uint32_t width = 0;
-    fseek(input_image, 18, SEEK_SET);
-    fread(wBytes, sizeof(uint8_t), 4, input_image); 
-    rewind(input_image);
-
-    width |= wBytes[0];
-    width |= (wBytes[1] << 8);
-    width |= (wBytes[2] << 16);
-    width |= (wBytes[3] << 24);
-    printf("BMP width: %u \n", width);
-
-    return width;
-}
-
 int main(int argc, char* argv[]) {
 
-    //char input_fn[] = "test.bmp";
     char *input_fn = argv[1];
     char *buffer, ch;
 
+    // open with ability to read filesize
     FILE *input_image=fopen(input_fn,"rb");
 
     fseek(input_image, 0, SEEK_END);
@@ -39,7 +21,7 @@ int main(int argc, char* argv[]) {
     rewind(input_image);
     fread(buffer, 1, filesize, input_image);
 
-    // parse width
+    // parse header information 
     uint32_t width;
     int32_t h;
     uint32_t height;
@@ -68,25 +50,18 @@ int main(int argc, char* argv[]) {
  
     int bytes_per_row = width * 4; // number of bytes * ( R, G, B, Padding)
    
-    int i,j; 
-    int ind = 0;
+    int i,j; // ints for row index and column index 
+    int ind = 0; // int for buffer index value
     int k = 0; // int to keep track of column 
 
     int row_type = 0; // 0 - RG, 1 - GB
     for(i=0;i<height;i++){ // for each row
-        int base_index = IMAGE_DATA_OFFSET + (i * bytes_per_row); 
+        int base_index = offset + (i * bytes_per_row); 
          
         for (int j = 0; j < bytes_per_row; j += 4) {
 
             ind = base_index + j; 
     
-            /*
-            printf("\n index:%d ", ind);
-            printf("\nB:%d ", buffer[ind]);
-            printf("G:%d ", (unsigned char)buffer[ind+1]);
-            printf("R:%d ", (unsigned char)buffer[ind+2]);
-            */
-       
             if(row_type == 0){ 
                 if(k==0){
                     // Zero B,G
@@ -114,56 +89,44 @@ int main(int argc, char* argv[]) {
 
             }
             
-
-            /*
-            printf("\n index:%d ", ind);
-            printf("\nB:%d ", buffer[ind]);
-            printf("G:%d ", (unsigned char)buffer[ind+1]);
-            printf("R:%d ", (unsigned char)buffer[ind+2]);
-            */
-            // Skips buffer[i + 3] (padding)
-            
         }
 
         // toggle row type
         row_type ^= 1;
-    
         
     }
-
-    printf("\n");
 
     // go to beginning of data    
     rewind(input_image);
 
     // Allocate a buffer to hold data temporarily
-    size_t bytesWritten = 0;
-    size_t chunkSize = 1024; // 1 KB
-    size_t totalChunks = filesize / chunkSize;
-    size_t remainingBytes = filesize % chunkSize;
+    size_t bytes_written = 0;
+    size_t chunk_size = 1024; // 1 KB
+    size_t total_chunks = filesize / chunk_size;
+    size_t remaining_bytes = filesize % chunk_size;
         
     printf("filesize: %lu\n", filesize);
-    printf("totalChunks: %lu\n", totalChunks);
+    printf("total_chunks: %lu\n", total_chunks);
 
-    for (size_t m = 0; m < totalChunks; m++) {
+    for (size_t m = 0; m < total_chunks; m++) {
 
-        bytesWritten = fwrite(buffer + (m * chunkSize), 1, chunkSize, input_image);
-        if (bytesWritten != chunkSize) {
+        bytes_written = fwrite(buffer + (m * chunk_size), 1, chunk_size, input_image);
+        if (bytes_written != chunk_size) {
             perror("Error writing to file");
             break;
         }
     }
-    printf("bytesWritten:%lu \n", bytesWritten);
+    printf("bytes_written:%lu \n", bytes_written);
 
    // Write remaining bytes
-    if (remainingBytes > 0) {
-        bytesWritten = fwrite(buffer + (totalChunks * chunkSize), 1, remainingBytes, input_image);
-        if (bytesWritten != remainingBytes) {
+    if (remaining_bytes > 0) {
+        bytes_written = fwrite(buffer + (total_chunks * chunk_size), 1, remaining_bytes, input_image);
+        if (bytes_written != remaining_bytes) {
             perror("Error writing remaining bytes");
         }
     } 
     
-    printf("bytesWritten:%lu \n", bytesWritten);
+    printf("bytes_written:%lu \n", bytes_written);
 
     fclose(input_image);
     free(buffer);
