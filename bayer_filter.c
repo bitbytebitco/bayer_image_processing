@@ -20,9 +20,10 @@ uint32_t parseWidth(FILE *input_image){
     return width;
 }
 
-int main(){
+int main(int argc, char* argv[]) {
 
-    char input_fn[] = "test.bmp";
+    //char input_fn[] = "test.bmp";
+    char *input_fn = argv[1];
     char *buffer, ch;
 
     FILE *input_image=fopen(input_fn,"rb");
@@ -39,7 +40,26 @@ int main(){
     fread(buffer, 1, filesize, input_image);
 
     // parse width
-    uint32_t width = parseWidth(input_image);
+    uint32_t width;
+    int32_t h;
+    uint32_t height;
+    uint32_t offset;
+    fseek(input_image, 10, SEEK_SET);
+    fread(&offset, sizeof(offset), 1, input_image); 
+    fseek(input_image, 18, SEEK_SET);
+    fread(&width, sizeof(width), 1, input_image); 
+    fseek(input_image, 22, SEEK_SET);
+    fread(&h, sizeof(h), 1, input_image); 
+    rewind(input_image);
+
+    if(1 && (1 << 31)){
+        height = ~h+1;
+    }
+    //height = height * -1;
+
+    printf("BMP width: %u \n", width);
+    printf("BMP height: %d \n", height);
+    printf("BMP data offset: %u \n", offset);
 
     // reopen for writing
     fclose(input_image);
@@ -53,17 +73,19 @@ int main(){
     int k = 0; // int to keep track of column 
 
     int row_type = 0; // 0 - RG, 1 - GB
-    for(i=0;i<768;i++){ // for each row
+    for(i=0;i<height;i++){ // for each row
         int base_index = IMAGE_DATA_OFFSET + (i * bytes_per_row); 
          
         for (int j = 0; j < bytes_per_row; j += 4) {
 
             ind = base_index + j; 
-
+    
+            /*
             printf("\n index:%d ", ind);
             printf("\nB:%d ", buffer[ind]);
             printf("G:%d ", (unsigned char)buffer[ind+1]);
             printf("R:%d ", (unsigned char)buffer[ind+2]);
+            */
        
             if(row_type == 0){ 
                 if(k==0){
@@ -93,10 +115,12 @@ int main(){
             }
             
 
+            /*
             printf("\n index:%d ", ind);
             printf("\nB:%d ", buffer[ind]);
             printf("G:%d ", (unsigned char)buffer[ind+1]);
             printf("R:%d ", (unsigned char)buffer[ind+2]);
+            */
             // Skips buffer[i + 3] (padding)
             
         }
