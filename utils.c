@@ -1,4 +1,34 @@
 #include<stdio.h>
+#include <stdint.h>
+#include "types.h"
+
+
+struct headerInfo get_header_info(FILE *input_image){
+    int32_t h;
+    uint32_t width;
+    uint32_t height;
+    uint32_t offset;
+
+    struct headerInfo hi;
+
+    fseek(input_image, 10, SEEK_SET);
+    fread(&offset, sizeof(offset), 1, input_image); 
+    fseek(input_image, 18, SEEK_SET);
+    fread(&width, sizeof(width), 1, input_image); 
+    fseek(input_image, 22, SEEK_SET);
+    fread(&h, sizeof(h), 1, input_image); 
+    rewind(input_image);
+
+    if(1 && (1 << 31)){
+        height = ~h+1;
+    }
+
+    hi.width = width;
+    hi.height = height;
+    hi.offset = offset;
+
+    return hi;
+}
 
 void write_output_to_file(FILE *input_image, long filesize, char *buffer){
 

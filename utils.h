@@ -2,7 +2,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-// Function declarations
+#include "types.h"
+
+// prototypes 
+struct headerInfo get_header_info(FILE *input_image);
+
 void write_output_to_file(FILE *input_image, long filesize, char *buffer);
 
 #endif 
