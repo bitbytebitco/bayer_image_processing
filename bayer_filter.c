@@ -6,17 +6,24 @@
 
 int main(int argc, char* argv[]) {
 
-    char *input_fn = argv[1];
-    char *buffer, ch;
+    // check for input file
+    if(argc < 1){
+        printf("Please add an input file as the first argument (e.g. ./run_script [filename.png]");
+        return 1;
+    }
 
-    printf("Creating Bayer pattern image with file: %s\n", input_fn);
+    char *input_fn = argv[1];
+    char *buffer;
+
+    printf("\nCreating Bayer pattern image with file: %s\n", input_fn);
 
     // open with ability to read filesize
-    FILE *input_image=fopen(input_fn,"rb");
+    FILE *input_image;
+    input_image = fopen(input_fn,"rb");
 
     // obtain filesize
     fseek(input_image, 0, SEEK_END);
-    long filesize = ftell(input_image);
+    size_t filesize = ftell(input_image);
     rewind(input_image);
 
     // allocate memory
@@ -24,7 +31,11 @@ int main(int argc, char* argv[]) {
 
     // copy input_image bytes into buffer 
     rewind(input_image);
-    fread(buffer, 1, filesize, input_image);
+    size_t res = fread(buffer, 1, filesize, input_image);
+    if(res != filesize){
+        fprintf(stderr, "Error reading file. Expected %ld bytes, but read %ld bytes.\n", filesize, res);
+        exit(1);  
+    }
 
     // parse header information 
     struct headerInfo hi = get_header_info(input_image);
@@ -38,17 +49,19 @@ int main(int argc, char* argv[]) {
     input_image=fopen(input_fn,"wb+");
     rewind(input_image);
  
-    int bytes_per_row = hi.width * 4; // number of bytes * ( R, G, B, Padding)
+    uint32_t bytes_per_row = hi.width * 4; // number of bytes * ( R, G, B, Padding)
    
-    int i,j; // ints for row index and column index 
-    int ind = 0; // int for buffer index value
-    int k = 0; // int to keep track of column 
+    // ints for row index and column index 
+    uint32_t i;
+    uint32_t j; 
+    uint32_t ind = 0; // int for buffer index value
+    uint8_t k = 0; // int to keep track of column 
 
-    int row_type = 0; // 0 - RG, 1 - GB
+    uint8_t row_type = 0; // 0 - RG, 1 - GB
     for(i=0;i<hi.height;i++){ // for each row
-        int base_index = hi.offset + (i * bytes_per_row); 
+        uint32_t base_index = hi.offset + (i * bytes_per_row); 
          
-        for (int j = 0; j < bytes_per_row; j += 4) {
+        for (j = 0; j < bytes_per_row; j += 4) {
 
             ind = base_index + j; 
     
