@@ -19,8 +19,10 @@ struct headerInfo get_header_info(FILE *input_image){
     fread(&h, sizeof(h), 1, input_image); 
     rewind(input_image);
 
-    if(1 && (1 << 31)){
+    if(h && (1 << 31)){
         height = ~h+1;
+        height = ~height+1;
+        //height = height * -1;
     }
 
     hi.width = width;
@@ -28,6 +30,94 @@ struct headerInfo get_header_info(FILE *input_image){
     hi.offset = offset;
 
     return hi;
+}
+
+struct indexMap generateIndexMap(char *new_buf, int i, int j, int base_index_last, int base_index, int base_index_next, int bytes_per_row, int width, int height){
+
+    struct indexMap im;
+
+    im.ind_ul = base_index_last + j - 4; 
+    im.ind_u = base_index_last + j; 
+    im.ind_ur = base_index_last + j + 4; 
+    
+    im.ind_l = base_index + j - 4; 
+    im.ind = base_index + j; 
+    im.ind_r = base_index + j + 4; 
+
+    im.ind_dl = base_index_next + j - 4; 
+    im.ind_d = base_index_next + j; 
+    im.ind_dr =base_index_next + j + 4; 
+
+
+    // mirroring values
+    if(j == 0){ // if on the first column 
+        if(i == 0){ // if first row (top left corner)
+            im.ind_ul = im.ind_dr; 
+            im.ind_u = im.ind_d;
+            im.ind_ur = im.ind_dr;
+            im.ind_l = im.ind_r;
+            im.ind_dl = im.ind_dr;
+                 
+        } else if(i == (height-1)) { // bottom row (bottom left corner) 
+
+            im.ind_ul = im.ind_ur; 
+            im.ind_l = im.ind_r;
+            im.ind_dl = im.ind_ur;
+            im.ind_d = im.ind_u;
+            im.ind_dr = im.ind_ur;
+                                        
+        } else { // not on the first or last row (middle)
+       
+            // mirror values  
+            im.ind_ul = im.ind_ur; 
+            im.ind_l = im.ind_r;
+            im.ind_dl = im.ind_dr;
+
+        } 
+        
+    } else if(j == (width-1)){ // if last column
+    } else if(j >= bytes_per_row - 4){ // if last column
+
+        if(i == 0){ // if first row (top right corner)
+
+            im.ind_ul = im.ind_dl;
+            im.ind_u = im.ind_d;
+            im.ind_ur = im.ind_dl;
+            im.ind_r = im.ind_l;
+            im.ind_dr = im.ind_dl;
+
+        } else if(i == (height-1)){ // bottom row (bottom right corner) 
+
+            im.ind_ur = im.ind_ul;
+            im.ind_r = im.ind_l;
+            im.ind_dr = im.ind_ul;
+            im.ind_d = im.ind_u;
+            im.ind_dl = im.ind_ul; 
+
+        } else { // not on the first or last row (middle)
+
+            im.ind_ur = im.ind_ul;
+            im.ind_r = im.ind_l;
+            im.ind_dr = im.ind_dl;
+
+        }
+
+    } else { // if middle columns 
+        if(i == 0){ // first row
+            im.ind_ul = im.ind_dl;
+            im.ind_u = im.ind_d;
+            im.ind_ur = im.ind_dr;
+        } else if(i == (height-1)) { // last row
+
+            im.ind_dl = im.ind_ul;
+            im.ind_d = im.ind_u;
+            im.ind_dl = im.ind_ur;
+
+        }
+    }
+
+    return im;
+
 }
 
 void write_output_to_file(FILE *input_image, long filesize, char *buffer){
