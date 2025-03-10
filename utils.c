@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "types.h"
 
 
@@ -12,17 +13,29 @@ struct headerInfo get_header_info(FILE *input_image){
     struct headerInfo hi;
 
     fseek(input_image, 10, SEEK_SET);
-    fread(&offset, sizeof(offset), 1, input_image); 
+    size_t res = fread(&offset, sizeof(offset), 1, input_image); 
+
     fseek(input_image, 18, SEEK_SET);
-    fread(&width, sizeof(width), 1, input_image); 
+    res = fread(&width, sizeof(width), 1, input_image); 
+    if(res != 1){
+        fprintf(stderr, "Error reading file. Expected 1 byte, but read %ld bytes.\n", res);
+        exit(1);  
+    }
+
     fseek(input_image, 22, SEEK_SET);
-    fread(&h, sizeof(h), 1, input_image); 
+    res = fread(&h, sizeof(h), 1, input_image); 
+    if(res != 1){
+        fprintf(stderr, "Error reading file. Expected 1 byte, but read %ld bytes.\n", res);
+        exit(1);  
+    }
     rewind(input_image);
 
     if(h && (1 << 31)){
         height = ~h+1;
         height = ~height+1;
         //height = height * -1;
+    } else {
+        height = h;
     }
 
     hi.width = width;
@@ -32,7 +45,7 @@ struct headerInfo get_header_info(FILE *input_image){
     return hi;
 }
 
-struct indexMap generateIndexMap(char *new_buf, int i, int j, int base_index_last, int base_index, int base_index_next, int bytes_per_row, int width, int height){
+struct indexMap generateIndexMap(int i, int j, int base_index_last, int base_index, int base_index_next, int bytes_per_row, int width, int height){
 
     struct indexMap im;
 
