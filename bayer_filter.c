@@ -9,6 +9,8 @@ int main(int argc, char* argv[]) {
     char *input_fn = argv[1];
     char *buffer, ch;
 
+    printf("Creating Bayer pattern image with file: %s\n", input_fn);
+
     // open with ability to read filesize
     FILE *input_image=fopen(input_fn,"rb");
 
