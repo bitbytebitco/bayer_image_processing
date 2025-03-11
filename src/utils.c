@@ -234,7 +234,7 @@ void runBilinearInterpolation(char * buffer, char * new_buf, struct headerInfo h
                     if(k==0){ // Red column
 
                         // generate image matrix
-                        int image[3][3] = {    
+                        uint8_t image[3][3] = {    
                             {(unsigned char)buffer[im.ind_ul], (unsigned char)buffer[im.ind_u+1] , (unsigned char)buffer[im.ind_ur]},
                             {(unsigned char)buffer[im.ind_l+1], 0 , (unsigned char)buffer[im.ind_r+1]},
                             {(unsigned char)buffer[im.ind_dl], (unsigned char)buffer[im.ind_d+1] , (unsigned char)buffer[im.ind_dr]}
@@ -277,7 +277,7 @@ void runBilinearInterpolation(char * buffer, char * new_buf, struct headerInfo h
                     } else { // Blue Column
 
                         // generate image matrix
-                        int image[3][3] = {    
+                        uint8_t image[3][3] = {    
                             {(unsigned char)buffer[im.ind_ul+2], (unsigned char)buffer[im.ind_u+1] , (unsigned char)buffer[im.ind_ur+2]},
                             {(unsigned char)buffer[im.ind_l+1], 0 , (unsigned char)buffer[im.ind_r+1]},
                             {(unsigned char)buffer[im.ind_dl+2], (unsigned char)buffer[im.ind_d+1] , (unsigned char)buffer[im.ind_dr+2]}
