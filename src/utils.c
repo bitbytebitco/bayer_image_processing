@@ -168,7 +168,7 @@ struct indexMap generateIndexMap(int i, int j, int base_index_last, int base_ind
 }
 
 // Applies a 3x3 convolution kernel to a 3x3 image value matrix
-int applyKernel(int image[3][3], float kernel[3][3]) {
+int applyKernel(uint8_t image[3][3], float kernel[3][3]) {
     int result = 0;
 
     for (int i = 0; i < 3; i++) {
