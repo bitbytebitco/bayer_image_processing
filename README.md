@@ -12,6 +12,8 @@ The expected inputs are *.png files and the resulting outputs are *.bmp files.
 
 ## Compiling
 There is a `Makefile`. Run `make` to compile everything, and `make clean` to clean up.
+> [!NOTE]  
+> `./run_script [input_file.png]` will perform compilation.
 
 ## Example
 #### Input Image
