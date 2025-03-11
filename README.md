@@ -5,7 +5,7 @@ The expected inputs are *.png files and the resulting outputs are *.bmp files.
 
 
 ## Quickstart
-``` ./run_scripts.sh intputs/kodim19.png```
+``` ./run_scripts.sh inputs/kodim19.png```
 
 > [!NOTE]  
 > This script makes use of `xdg-open`, so if you don't have this dependency then please view the output files (`output/bayer.bmp` and `output/demosaic.bmp`) manually.
