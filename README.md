@@ -10,6 +10,10 @@ The expected inputs are *.png files and the resulting outputs are *.bmp files.
 > [!NOTE]  
 > This script makes use of `xdg-open`, so if you don't have this dependency then please view the output files (`output/bayer.bmp` and `output/demosaic.bmp`) manually.
 
+> [!NOTE]  
+> This script requires `ImageMagick` 
+
+
 ## Compiling
 There is a `Makefile`. Run `make` to compile everything, and `make clean` to clean up.
 > [!NOTE]  
