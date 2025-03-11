@@ -1,8 +1,13 @@
+/*  
+ * Filename: bayer_filter.c  
+ * Description: Script that generates a simulated Bayer pattern image
+ * Author: Zachary Becker  
+ */
+
 #include<stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "utils.h"
-
 
 int main(int argc, char* argv[]) {
 
@@ -11,12 +16,14 @@ int main(int argc, char* argv[]) {
         printf("Please add an input file as the first argument (e.g. ./run_script [filename.png]");
         return 1;
     }
-
+    
+    // buffers
     char *input_fn = argv[1];
     char *buffer;
 
+     // user output 
     printf("\nCreating Bayer pattern image with file: %s\n", input_fn);
-
+    
     // open with ability to read filesize
     FILE *input_image;
     input_image = fopen(input_fn,"rb");
@@ -57,8 +64,9 @@ int main(int argc, char* argv[]) {
     uint32_t ind = 0; // int for buffer index value
     uint8_t k = 0; // int to keep track of column 
 
-    uint8_t row_type = 0; // 0 - RG, 1 - GB
+    uint8_t row_type = 1; // 0 - RG, 1 - GB
     for(i=0;i<hi.height;i++){ // for each row
+
         uint32_t base_index = hi.offset + (i * bytes_per_row); 
          
         for (j = 0; j < bytes_per_row; j += 4) {
@@ -102,6 +110,7 @@ int main(int argc, char* argv[]) {
     // overwrite input file with buffer contents
     write_output_to_file(input_image, filesize, buffer); 
     
+    // clean up
     fclose(input_image);
     free(buffer);
 

@@ -1,5 +1,12 @@
+#ifndef TYPES_H
+#define TYPES_H
 
-// types
+/*  
+ * Filename: types.h  
+ * Description: File for structure definitions 
+ * Author: Zachary Becker  
+ */
+
 struct headerInfo {
     uint32_t width;
     uint32_t height;
@@ -17,3 +24,5 @@ struct indexMap {
     int ind_d;  // bottom
     int ind_dr; // bottom right
 };
+
+#endif 
