@@ -14,10 +14,33 @@ The expected inputs are *.png files and the resulting outputs are *.bmp files.
 > This script requires `ImageMagick` 
 
 
-## Compiling
-There is a `Makefile`. Run `make` to compile everything, and `make clean` to clean up.
+## Steps for Running Manually
+
+### Change directory to src
+`cd src`
+
+### Compile 
+`make clean && make`
+
+`cd ..`
+
+### Convert PNG to BMP
+`convert [input_filename.png] -depth 8 -type TrueColorAlpha -define bmp:format=bmp4 -colorspace sRGB output/input.bmp`
+
+### Copy input image to bayer output file 
+`cp output/input.bmp output/bayer.bmp`
+
+### Run script to create Bayer Pattern (RGGB)
+`./src/bayer_filter output/bayer.bmp` 
+
+### Copy bayer pattern to final output file
+`cp output/bayer.bmp output/demosaic.bmp` 
+
+### Run script to create final output
+`./src/demosaic output/demosaic.bmp`
+
 > [!NOTE]  
-> `./run_script [input_file.png]` will perform compilation.
+> `./run_script [input_file.png]` will perform all of these steps.
 
 ## Example
 #### Input Image
